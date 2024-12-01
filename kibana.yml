@@ -1,0 +1,2 @@
+elasticsearch.hosts: http://elasticsearch:9200
+xpack.encryptedSavedObjects.encryptionKey: a39c9f9c34f1b422b606c17c9c1ecd0aa9fa1191fa2af2c0f3f7a3d0925c6ef8

@@ -1,0 +1,52 @@
+elastic:=V9VX=7qBgaL6KYRASZ7
+
+I have the same problem and after digging deep into the problem I post my considerations here and at the footer the link to the official docs.
+
+docker vs docker compose
+I you launch the docker run you MUST follow what is written in official elastic docs. In particular the flag -it create a pseudo console necessary to auto-generate the password and enrollment token
+
+If you launch the container with docker-compose.yml the Auto-generated password and enrollment will NOT be generated, (see the GitHub Issue) and is necessary to generate manually with the following commands:
+
+docker exec -ti elastic_container_name /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+docker exec -ti elastic_container_name /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+If you want a compose file with full setup you must use the official docker-compose file from elastic docs here github here.
+
+If you want a single node, remove EVERYTHINGS regarding node2 and node3
+
+Security
+I have noticed (but maybe wrong) that if you use ANY of the security env variables i.e. ELASTIC_PASSWORD or event setting the xpack.security.enabled=true you must set ALL security by hand (certificates, password, and so on).
+
+If you try to remove security with xpack.security.enabled=false kibana doesn't work correctly.
+
+Single node for dev purpose
+I post here my solution
+
+docker-compose.yml
+version: '3'
+
+services:
+  node01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    networks:
+      - net1
+    ports:
+      - 9200:9200
+    container_name: es-node01
+    environment:
+      - discovery.type=single-node
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    networks:
+      - net1
+    ports:
+      - 5601:5601
+    container_name: kib-01
+    depends_on: 
+      - node01
+networks:
+  net1:
+start with docker compose up -d and wait until all is started.
+
+launch this command to generate (reset) the elastic user password docker exec -ti es-node01 /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+
+launch this command to generate the enrollment token docker exec -ti es-node01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
