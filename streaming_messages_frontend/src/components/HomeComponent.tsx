@@ -11,8 +11,9 @@ const exampleMessages = [
   "LT4670の主な特長は何ですか？",
   "LT4670-SER01 (GNSS) オプションの機能は何ですか？",
   "LT4670-SER02 (SDI) オプションの機能は何ですか？",
-  "LT4670-SER03 (PTP) オプションの機能は何ですか？",
-  "LT4670はどのような規格に対応していますか？",
+  "NDI とは何ですか？",
+  "NDI はどのように機能しますか？",
+  "NDI を使用するメリットは何ですか？",
 ];
 
 const HomeComponent: React.FC<{
