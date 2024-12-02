@@ -2,10 +2,17 @@ import React from "react";
 import Image from "next/image";
 
 const exampleMessages = [
-  "What're some facts about Google?",
-  "How much revenue did Apple make last year?",
-  "Is McDonald's profitable?",
-  "What's the current stock price of Tesla?",
+  // "What is the LT4670?",
+  // "What are the key features of the LT4670?",
+  // "What are the hardware options available for the LT4670?",
+  // "How do I control the LT4670?",
+  // "Can I configure the SDI output on the LT4670?",
+  // "What is the function of the GNSS module (SER01)?"
+  "LT4670の主な特長は何ですか？",
+  "LT4670-SER01 (GNSS) オプションの機能は何ですか？",
+  "LT4670-SER02 (SDI) オプションの機能は何ですか？",
+  "LT4670-SER03 (PTP) オプションの機能は何ですか？",
+  "LT4670はどのような規格に対応していますか？",
 ];
 
 const HomeComponent: React.FC<{

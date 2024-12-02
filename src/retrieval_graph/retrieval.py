@@ -79,7 +79,7 @@ def make_pinecone_retriever(
     search_kwargs = configuration.search_kwargs
 
     search_filter = search_kwargs.setdefault("filter", {})
-    search_filter.update({"user_id": configuration.user_id})
+    # search_filter.update({"user_id": configuration.user_id})
     vstore = PineconeVectorStore.from_existing_index(
         os.environ["PINECONE_INDEX_NAME"], embedding=embedding_model
     )
@@ -103,6 +103,31 @@ def make_mongodb_retriever(
     pre_filter["user_id"] = {"$eq": configuration.user_id}
     yield vstore.as_retriever(search_kwargs=search_kwargs)
 
+@contextmanager
+def make_qdrant_retriever(
+    configuration: IndexConfiguration, embedding_model: Embeddings
+) -> Generator[VectorStoreRetriever, None, None]:
+    """Configure this agent to connect to a specific qdrant collection."""
+    from langchain_qdrant import QdrantVectorStore
+    from qdrant_client import QdrantClient
+
+
+    search_kwargs = configuration.search_kwargs
+
+    search_filter = search_kwargs.setdefault("filter", {})
+    # search_filter.update({"user_id": configuration.user_id})
+
+    client = QdrantClient(url=os.environ["QDRANT_URL"], api_key=os.environ["QDRANT_API_KEY"])
+
+    vstore = QdrantVectorStore(
+        client=client,
+        collection_name=configuration.agent_models,
+        embedding=embedding_model,
+    )
+
+    yield vstore.as_retriever(search_kwargs=search_kwargs)
+
+
 
 @contextmanager
 def make_retriever(
@@ -125,6 +150,10 @@ def make_retriever(
 
         case "mongodb":
             with make_mongodb_retriever(configuration, embedding_model) as retriever:
+                yield retriever
+
+        case "qdrant":
+            with make_qdrant_retriever(configuration, embedding_model) as retriever:
                 yield retriever
 
         case _:

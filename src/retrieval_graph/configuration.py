@@ -26,14 +26,24 @@ class IndexConfiguration:
         {"__template_metadata__": {"kind": "embeddings"}},
     ] = field(
         # default="openai/text-embedding-3-small",
-        default="cohere/embed-english-v3.0",
+        default="cohere/embed-multilingual-v3.0",
         metadata={
             "description": "Name of the embedding model to use. Must be a valid embedding model name."
         },
     )
 
+    agent_models: Annotated[
+        Literal["ndi-checker", "lt4670", "customer-care"],
+        {"__template_metadata__": {"kind": "agent"}},
+    ] = field(
+        default="",
+        metadata={
+            "description": "agent serve for docs context"
+        },
+    )
+
     retriever_provider: Annotated[
-        Literal["elastic", "elastic-local", "pinecone", "mongodb"],
+        Literal["elastic", "elastic-local", "pinecone", "mongodb", "qdrant"],
         {"__template_metadata__": {"kind": "retriever"}},
     ] = field(
         default="elastic-local",

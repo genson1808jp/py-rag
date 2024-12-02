@@ -70,7 +70,9 @@ export const sendMessage = async (params: {
       model_name: params.model,
       system_instructions: params.systemInstructions,
       user_id: params.userId,
-      retriever_provider: "elastic-local",
+      retriever_provider: "qdrant",
+      // agent_models: "ndi-checker",
+      agent_models: "lt4670",
     },
   };
 

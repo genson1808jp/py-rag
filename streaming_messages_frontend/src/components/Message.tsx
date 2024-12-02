@@ -62,9 +62,9 @@ export default function Message({
     >
       {isBot && (
         <img
-          src="/logo.jpeg"
+          src="/chatbot.png"
           alt="Bot Icon"
-          className="absolute left-3 top-4 w-8 h-8 rounded-full"
+          className="absolute left-3 top-4 w-10 h-10 rounded-full"
           style={{ transform: "translateX(-120%)" }}
         />
       )}
