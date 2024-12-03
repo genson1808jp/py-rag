@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
 import InputArea from "./InputArea";
 import HomeComponent from "./HomeComponent";
-import Settings, { StreamMode } from "./Settings";
+import Settings, { AssistantKey, StreamMode } from "./Settings";
 import { Message, Model } from "../types";
 import { handleStreamEvent } from "../utils/streamHandler";
 import {
@@ -18,10 +18,6 @@ import { ASSISTANT_ID_COOKIE } from "@/constants";
 import { getCookie, setCookie } from "@/utils/cookies";
 import { ThreadState } from "@langchain/langgraph-sdk";
 import { GraphInterrupt } from "./Interrupted";
-import { Resizable } from "re-resizable";
-import  Draggable  from "react-draggable";
-import { FiX } from "react-icons/fi"; // Thêm icon đóng
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5"; // Icon mở chat
 
 interface ChatInterfaceProps {
   toggleModal: () => void; // Define the type of the function prop
@@ -33,6 +29,7 @@ export default function ChatInterface( { toggleModal }: ChatInterfaceProps) {
   const [threadId, setThreadId] = useState<string | null>(null);
   const [assistantId, setAssistantId] = useState<string | null>(null);
   const [model, setModel] = useState<Model>("gpt-4o-mini" as Model);
+  const [assistant, setAssistant] = useState<AssistantKey>("customer-care" as AssistantKey);
   const [streamMode, setStreamMode] = useState<StreamMode>("messages");
   const [userId, setUserId] = useState<string>("");
   const [systemInstructions, setSystemInstructions] = useState<string>("");
@@ -41,6 +38,7 @@ export default function ChatInterface( { toggleModal }: ChatInterfaceProps) {
     useState<ThreadState<Record<string, any>>>();
   const [graphInterrupted, setGraphInterrupted] = useState(false);
   const [allowNullMessage, setAllowNullMessage] = useState(false);
+  const [showQa, setShowQa] = useState(false);
 
   const messageListRef = useRef<HTMLDivElement>(null);
 
@@ -71,7 +69,7 @@ export default function ChatInterface( { toggleModal }: ChatInterfaceProps) {
     if (messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, showQa]);
 
   const handleSendMessage = async (message: string | null) => {
     const messageId = uuidv4();
@@ -101,6 +99,7 @@ export default function ChatInterface( { toggleModal }: ChatInterfaceProps) {
         assistantId,
         message,
         messageId,
+        assistant,
         model,
         userId,
         systemInstructions,
@@ -124,60 +123,31 @@ export default function ChatInterface( { toggleModal }: ChatInterfaceProps) {
     }
   };
 
-  const [position, setPosition] = useState({ bottom: 20, right: 20 });
-  const modalRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const dragStart = useRef({ x: 0, y: 0 });
-
-  const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
-    isDragging.current = true;
-    dragStart.current = { x: e.clientX, y: e.clientY };
+  const onQaChange = (value: boolean) => {
+    setShowQa(value);
   };
-
-  const handleDrag = (e: MouseEvent) => {
-    if (!isDragging.current) return;
-
-    const deltaX = e.clientX - dragStart.current.x;
-    const deltaY = e.clientY - dragStart.current.y;
-
-    setPosition((prev) => ({
-      bottom: Math.max(prev.bottom - deltaY, 20), // Avoid negative values
-      right: Math.max(prev.right - deltaX, 20),
-    }));
-
-    dragStart.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handleDragEnd = () => {
-    isDragging.current = false;
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousemove", handleDrag);
-    document.addEventListener("mouseup", handleDragEnd);
-
-    return () => {
-      document.removeEventListener("mousemove", handleDrag);
-      document.removeEventListener("mouseup", handleDragEnd);
-    };
-  }, []);
 
   return (
     <div className="w-full h-full bg-[#212121] overflow-hidden rounded-lg shadow-md">
   <Settings
+    onQaChange={onQaChange}
     toggleModal={toggleModal}
-    onModelChange={setModel}
-    onSystemInstructionsChange={setSystemInstructions}
-    currentModel={model as any}
-    currentSystemInstructions={systemInstructions}
-    onStreamModeChange={setStreamMode}
-    currentStreamMode={streamMode}
-  />
-  {messages.length === 0 ? (
-    <HomeComponent onMessageSelect={handleSendMessage} />
-  ) : (
-    <div ref={messageListRef} className="overflow-y-auto h-full">
-      <MessageList messages={messages} />
+  onModelChange={setModel}
+  onAssistantChange={setAssistant}
+  onSystemInstructionsChange={setSystemInstructions}
+  currentModel={model as any}
+  currentAssistant={assistant as any}
+  currentSystemInstructions={systemInstructions}
+  onStreamModeChange={setStreamMode}
+  currentStreamMode={streamMode}
+/>
+{messages.length === 0 ? (
+  <HomeComponent asisstant={assistant} onQaChange={onQaChange} onMessageSelect={handleSendMessage} />
+) : (
+  <div ref={messageListRef} className="overflow-y-auto h-full">
+    <MessageList
+      messages={messages}
+      qaComponent={showQa && <HomeComponent asisstant={assistant} onQaChange={onQaChange} onMessageSelect={handleSendMessage} />} />
       {!!graphInterrupted && !!threadState && !!threadId ? (
         <div className="flex items-center justify-start w-2/3 mx-auto">
           <GraphInterrupt

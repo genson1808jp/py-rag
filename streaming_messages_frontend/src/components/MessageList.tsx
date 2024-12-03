@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, ReactNode } from "react";
 import Message from "./Message";
 import { Message as MessageType } from "../types";
+import HomeComponent from "./HomeComponent";
 
-export default function MessageList({ messages }: { messages: MessageType[] }) {
+export default function MessageList({ messages, qaComponent }: { messages: MessageType[], qaComponent: ReactNode}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +30,7 @@ export default function MessageList({ messages }: { messages: MessageType[] }) {
       ))}
       {/* Invisible div to act as scroll target */}
       <div ref={bottomRef} />
+      { qaComponent }
     </div>
   );
 }

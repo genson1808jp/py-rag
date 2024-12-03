@@ -46,6 +46,7 @@ export const sendMessage = async (params: {
   messageId: string;
   message: string | null;
   model: string;
+  assistant: string;
   userId: string;
   systemInstructions: string;
   streamMode: StreamMode;
@@ -72,7 +73,7 @@ export const sendMessage = async (params: {
       user_id: params.userId,
       retriever_provider: "qdrant",
       // agent_models: "ndi-checker",
-      agent_models: "lt4670",
+      agent_models: params.assistant,
     },
   };
 
